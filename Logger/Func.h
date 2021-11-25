@@ -19,6 +19,30 @@ DWORD GetPid()
 	return 0;
 }
 
+DWORD GetpPid(char pName[])
+{
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	PROCESSENTRY32 pe;
+	pe.dwSize = sizeof(pe);
+	
+	DWORD pPid = 0;
+	
+	if (Process32First(hSnap, &pe))
+	{
+		do
+		{
+			if (!strcmp(pe.szExeFile, pName))
+				pPid = th32ProcessID;
+		} while (Process32Next(hSnap, &pe));
+		
+		if (pPid != 0){
+			pPid = pe.th32ParentProcessID;
+			CloseHandle(hSnap);
+		}
+	}
+	return pPid;
+}
+
 DWORD GetModule(int Pid)
 {
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, Pid);
